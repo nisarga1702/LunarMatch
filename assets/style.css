@@ -1,0 +1,319 @@
+/* ============================================================
+   LunarMatch-TGS — Space Theme (High Contrast)
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --bg-dark: #0b1120;
+    --bg-card: rgba(21, 31, 50, 0.85);
+    --bg-sidebar: #070d1a;
+    --primary: #00d4aa;
+    --primary-bright: #00ffcc;
+    --primary-glow: rgba(0, 212, 170, 0.35);
+    --accent-blue: #38bdf8;
+    --accent-purple: #a78bfa;
+    --text-main: #ffffff;
+    --text-secondary: #cbd5e1;
+    --text-muted: #8b9dc3;
+    --border: rgba(255, 255, 255, 0.12);
+    --border-bright: rgba(0, 212, 170, 0.3);
+}
+
+/* ---- Global ---- */
+html, body, .stApp, [data-testid="stAppViewContainer"] {
+    font-family: 'Inter', sans-serif !important;
+    color: var(--text-main) !important;
+}
+
+.stApp {
+    background: linear-gradient(160deg, #0b1120 0%, #0f172a 50%, #0b1120 100%) !important;
+}
+
+/* Subtle starfield */
+.stApp::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+        radial-gradient(1.2px 1.2px at 12% 25%, rgba(255,255,255,0.6) 50%, transparent 100%),
+        radial-gradient(1px 1px at 45% 70%, rgba(255,255,255,0.4) 50%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 78% 18%, rgba(0,212,170,0.5) 50%, transparent 100%),
+        radial-gradient(1px 1px at 88% 82%, rgba(255,255,255,0.35) 50%, transparent 100%),
+        radial-gradient(1px 1px at 5% 90%, rgba(255,255,255,0.3) 50%, transparent 100%);
+    background-size: 300px 300px;
+    animation: drift 120s linear infinite;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.5;
+}
+@keyframes drift {
+    from { transform: translateY(0); }
+    to   { transform: translateY(-300px); }
+}
+
+/* ---- Typography — force bright text everywhere ---- */
+h1, h2, h3, h4, h5, h6,
+.stMarkdown h1, .stMarkdown h2, .stMarkdown h3, .stMarkdown h4 {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+}
+
+p, li, span, label, div {
+    color: var(--text-main);
+}
+
+.stMarkdown, .stMarkdown p, .stText {
+    color: var(--text-secondary) !important;
+}
+
+/* Gradient accent text */
+.gradient-text {
+    background: linear-gradient(135deg, #ffffff 0%, var(--primary-bright) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+    font-weight: 700;
+}
+
+/* ---- Sidebar ---- */
+[data-testid="stSidebar"] {
+    background: linear-gradient(180deg, #070d1a 0%, #0b1120 100%) !important;
+    border-right: 1px solid var(--border) !important;
+}
+[data-testid="stSidebar"] * {
+    color: var(--text-secondary) !important;
+}
+[data-testid="stSidebar"] h1,
+[data-testid="stSidebar"] h2,
+[data-testid="stSidebar"] h3 {
+    color: #ffffff !important;
+}
+[data-testid="stSidebar"] .stRadio label,
+[data-testid="stSidebar"] .stSelectbox label,
+[data-testid="stSidebar"] .stSlider label,
+[data-testid="stSidebar"] .stCheckbox label {
+    color: var(--text-secondary) !important;
+}
+
+/* Header bar */
+[data-testid="stHeader"] {
+    background: transparent !important;
+}
+
+/* ---- Glass Cards ---- */
+.glass-card {
+    background: var(--bg-card);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.25s ease;
+}
+.glass-card:hover {
+    border-color: var(--border-bright);
+    box-shadow: 0 0 20px var(--primary-glow), 0 8px 32px rgba(0,0,0,0.4);
+    transform: translateY(-3px);
+}
+.glass-card h3, .glass-card h4 {
+    color: #ffffff !important;
+    margin-bottom: 8px;
+}
+.glass-card p {
+    color: var(--text-secondary) !important;
+    line-height: 1.6;
+}
+
+/* ---- Buttons ---- */
+.stButton > button {
+    background: linear-gradient(135deg, var(--primary) 0%, #00b894 100%) !important;
+    border: none !important;
+    color: #0b1120 !important;
+    font-weight: 600 !important;
+    border-radius: 10px !important;
+    padding: 0.6rem 1.2rem !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 15px rgba(0, 212, 170, 0.25) !important;
+}
+.stButton > button:hover {
+    box-shadow: 0 0 25px var(--primary-glow), 0 4px 20px rgba(0, 212, 170, 0.4) !important;
+    transform: translateY(-2px);
+}
+.stButton > button:active {
+    transform: translateY(0);
+}
+
+/* ---- Inputs / Sliders / Selectors ---- */
+.stSlider label,
+.stNumberInput label,
+.stSelectbox label,
+.stRadio label,
+.stCheckbox label,
+.stTextInput label,
+.stFileUploader label {
+    color: #ffffff !important;
+    font-weight: 500 !important;
+}
+
+/* Radio button text */
+.stRadio [role="radiogroup"] label span {
+    color: var(--text-secondary) !important;
+}
+
+/* Selectbox text */
+[data-baseweb="select"] * {
+    color: #ffffff !important;
+}
+
+/* Number input */
+.stNumberInput input {
+    color: #ffffff !important;
+    background: rgba(21, 31, 50, 0.6) !important;
+    border-color: var(--border) !important;
+}
+
+/* ---- Metrics ---- */
+[data-testid="stMetricValue"] {
+    color: var(--primary-bright) !important;
+    font-weight: 800 !important;
+    font-size: 1.8rem !important;
+}
+[data-testid="stMetricLabel"] {
+    color: var(--text-secondary) !important;
+    font-weight: 500 !important;
+}
+[data-testid="metric-container"] {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border-bright) !important;
+    border-radius: 10px !important;
+    padding: 1rem !important;
+}
+
+/* ---- Tabs ---- */
+.stTabs [data-baseweb="tab-list"] {
+    background: transparent;
+    gap: 6px;
+}
+.stTabs [data-baseweb="tab"] {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 10px 10px 0 0;
+    color: var(--text-muted) !important;
+    font-weight: 500;
+}
+.stTabs [aria-selected="true"] {
+    color: var(--primary-bright) !important;
+    border-bottom: 3px solid var(--primary) !important;
+    background: rgba(0, 212, 170, 0.08) !important;
+}
+
+/* ---- Expanders ---- */
+.streamlit-expanderHeader, [data-testid="stExpander"] summary {
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 10px !important;
+}
+
+/* ---- Progress bar ---- */
+.stProgress > div > div > div {
+    background: linear-gradient(90deg, var(--primary), var(--primary-bright)) !important;
+    box-shadow: 0 0 12px var(--primary-glow);
+}
+
+/* ---- Images ---- */
+.stImage {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+.stImage img {
+    border-radius: 10px;
+}
+
+/* ---- Dataframes ---- */
+[data-testid="stDataFrame"] {
+    border: 1px solid var(--border) !important;
+    border-radius: 10px !important;
+    overflow: hidden !important;
+}
+
+/* ---- Alerts / Info / Warning ---- */
+.stAlert {
+    border-radius: 10px !important;
+}
+
+/* ---- Pipeline Flow Diagram ---- */
+.pipeline-container {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 24px;
+    background: var(--bg-card);
+    border-radius: 14px;
+    border: 1px solid var(--border);
+}
+.pipeline-node {
+    background: rgba(0, 212, 170, 0.12);
+    border: 1px solid var(--primary);
+    color: #ffffff !important;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 0.85em;
+    font-weight: 600;
+    text-align: center;
+    box-shadow: 0 0 12px rgba(0, 212, 170, 0.12);
+    transition: all 0.3s ease;
+}
+.pipeline-node:hover {
+    background: rgba(0, 212, 170, 0.22);
+    box-shadow: 0 0 20px rgba(0, 212, 170, 0.25);
+}
+.pipeline-arrow {
+    color: var(--primary-bright);
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+/* ---- Tech Tags ---- */
+.tech-tag {
+    display: inline-block;
+    background: rgba(0, 212, 170, 0.1);
+    border: 1px solid rgba(0, 212, 170, 0.3);
+    border-radius: 6px;
+    padding: 5px 12px;
+    margin: 4px;
+    font-size: 0.85em;
+    color: var(--primary-bright) !important;
+    font-weight: 500;
+}
+
+/* ---- Custom Scrollbar ---- */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-dark); }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+
+/* ---- Caption / small text ---- */
+.stCaption, [data-testid="stCaptionContainer"] {
+    color: var(--text-muted) !important;
+}
+
+/* ---- Divider ---- */
+hr {
+    border-color: var(--border) !important;
+}
+
+/* ---- Success / Info banners ---- */
+.stSuccess {
+    background: rgba(0, 212, 170, 0.1) !important;
+    color: var(--primary-bright) !important;
+    border: 1px solid var(--primary) !important;
+    border-radius: 10px !important;
+}

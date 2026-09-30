@@ -1,0 +1,5 @@
+from .synthetic_terrain import generate_lunar_terrain, render_illuminated, generate_demo_pair
+from .landmark_detector import detect_craters, detect_edges_ridges, detect_landmarks, build_landmark_graph, coarse_match_landmarks, visualize_landmarks, visualize_landmark_graph
+from .sun_geometry import compute_sun_direction, compute_illumination_map, compute_shadow_map, illumination_consistency_score, visualize_sun_direction, visualize_shadow_analysis, compute_confidence_breakdown
+from .feature_matcher import extract_features, match_features_bruteforce, landmark_guided_match, score_match_confidence, visualize_matches, visualize_keypoints
+from .registration import ransac_filter, spatial_distribution_filter, subpixel_refine, compute_registration_metrics, apply_registration, full_pipeline

@@ -1,0 +1,1 @@
+@echo off\npython -m venv .venv\ncall .venv\\Scripts\\activate\npython -m pip install -r requirements.txt\nstreamlit run app.py\npause\n
