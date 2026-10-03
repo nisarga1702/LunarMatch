@@ -165,6 +165,14 @@ def full_pipeline(image_a, image_b, sun_az_a=120, sun_el_a=35, sun_az_b=240, sun
     kp_b, desc_b = extract_features(gray_b, method=feature_method)
     results.update({'keypoints_a': kp_a, 'keypoints_b': kp_b})
     
+    # Generate keypoint visualizations
+    try:
+        from .feature_matcher import visualize_keypoints, visualize_matches
+        results['kp_a_vis'] = visualize_keypoints(image_a, kp_a)
+        results['kp_b_vis'] = visualize_keypoints(image_b, kp_b)
+    except Exception:
+        pass
+    
     # 3. Match — always do bruteforce, optionally also guided
     raw_matches = match_features_bruteforce(desc_a, desc_b)
     results['raw_matches'] = raw_matches
@@ -185,12 +193,37 @@ def full_pipeline(image_a, image_b, sun_az_a=120, sun_el_a=35, sun_az_b=240, sun
             results['transform'] = M
             results['inlier_mask'] = mask
             
+            # Generate match visualizations
+            try:
+                # All matches visualization
+                results['matches_vis'] = visualize_matches(image_a, image_b, kp_a, kp_b, raw_matches, mask=None)
+                # RANSAC inlier/outlier visualization
+                ransac_mask_int = mask.astype(np.uint8).reshape(-1, 1)
+                results['ransac_vis'] = visualize_matches(image_a, image_b, kp_a, kp_b, raw_matches, mask=ransac_mask_int)
+            except Exception:
+                pass
+            
             sp_mask = spatial_distribution_filter(pts_a, pts_b, mask)
             if sp_mask is not None:
                 sp_mask = np.asarray(sp_mask).ravel().astype(bool)
             else:
                 sp_mask = mask
             results['spatial_mask'] = sp_mask
+            
+            # Coverage visualization (draw grid on image)
+            try:
+                h, w = image_a.shape[:2]
+                cov_vis = image_a.copy()
+                for gi in range(1, 4):
+                    cv2.line(cov_vis, (gi * w // 4, 0), (gi * w // 4, h), (0, 200, 180), 1)
+                    cv2.line(cov_vis, (0, gi * h // 4), (w, gi * h // 4), (0, 200, 180), 1)
+                pts_a_arr_tmp = np.float32(pts_a)
+                for i, (x, y) in enumerate(pts_a_arr_tmp):
+                    if sp_mask[i]:
+                        cv2.circle(cov_vis, (int(x), int(y)), 5, (0, 255, 0), -1)
+                results['coverage_vis'] = cov_vis
+            except Exception:
+                pass
             
             # 5. Refine
             pts_a_arr = np.float32(pts_a)

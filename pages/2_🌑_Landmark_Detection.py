@@ -47,7 +47,7 @@ if st.button("Run Landmark Detection", type="primary", use_container_width=True)
                 lm_b = landmark_detector.detect_landmarks(img_b_gray)
                 
                 # Graphs
-                graph_a, graph_b = landmark_detector.build_landmark_graph(lm_a, lm_b)
+                graph_a, graph_b = landmark_detector.build_landmark_graph(lm_a['all_points'], lm_b['all_points'])
                 
                 # Coarse Match
                 matches = landmark_detector.coarse_match_landmarks(graph_a, graph_b)

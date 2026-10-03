@@ -46,10 +46,10 @@ if st.button("🚀 Run Full Pipeline", type="primary", use_container_width=True)
             my_bar.progress(50, text="Matching and applying constraints...")
             results = registration.full_pipeline(
                 img_a, img_b, 
-                meta.get('sun_az_a', 0), meta.get('sun_el_a', 0),
-                meta.get('sun_az_b', 0), meta.get('sun_el_b', 0),
-                method=method, max_features=max_features, ransac_thresh=ransac_thresh,
-                use_landmarks=use_landmarks, use_sun=use_sun, ratio_test=ratio_test
+                meta.get('sun_az_a', 120), meta.get('sun_el_a', 35),
+                meta.get('sun_az_b', 240), meta.get('sun_el_b', 45),
+                feature_method=method.lower(),
+                use_landmarks=use_landmarks, use_sun_geometry=use_sun
             )
             
             my_bar.progress(85, text="Computing metrics and warping...")
