@@ -1,127 +1,93 @@
 import streamlit as st
-import os
 import cv2
 import numpy as np
-import plotly.graph_objects as go
+import pandas as pd
+from core.sun_geometry import (
+    compute_sun_direction, compute_illumination_map, compute_shadow_map,
+    illumination_consistency_score, visualize_sun_direction, compute_confidence_breakdown
+)
+from core.catalog_builder import populate_default_catalog
 
 st.set_page_config(page_title="Sun Geometry | LunarMatch", page_icon="☀️", layout="wide")
+populate_default_catalog()
 
-css_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), "assets", "style.css")
-if os.path.exists(css_path):
-    with open(css_path) as f:
-        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+st.title("☀️ Sun Geometry & Illumination Analysis")
+st.caption("Temporal and Solar Illumination Consistency Verification")
 
-try:
-    from core import sun_geometry
-except ImportError:
-    st.warning("Core modules are still being developed.")
-    sun_geometry = None
-
-st.title("☀️ Step 3: Sun Geometry & Illumination")
-
-if "image_a" not in st.session_state or "image_b" not in st.session_state:
-    st.warning("⚠️ No images found. Please go to the Image Input page first.")
-    st.stop()
-if "metadata" not in st.session_state:
-    st.warning("⚠️ No metadata found.")
-    st.stop()
-if "landmarks_a" not in st.session_state:
-    st.warning("⚠️ No landmarks found. Please go to Landmark Detection page first.")
+if 'top_match' not in st.session_state or st.session_state['top_match'] is None:
+    st.warning("⚠️ Please run matching on Page 2 first to select a candidate image for solar geometry analysis.")
     st.stop()
 
-st.info("💡 **Innovation Highlight:** We use acquisition time, spacecraft geometry and Sun position to reconstruct observation conditions and use illumination/shadow consistency as an additional constraint.")
+top_match = st.session_state['top_match']
 
-meta = st.session_state.metadata
+st.markdown(f"""
+<div class='glass-card'>
+    <h3>Target Analysis Candidate: <b>{top_match['crater_name']} ({top_match['label']})</b></h3>
+    <p>Feature Match Confidence: <b>{top_match['confidence']}%</b></p>
+</div>
+""", unsafe_allow_html=True)
 
-st.markdown("### Sun Position")
-colA, colB = st.columns(2)
-with colA:
-    st.metric("Source Sun Position", f"Azimuth: {meta.get('sun_az_a', 0)}°", f"Elevation: {meta.get('sun_el_a', 0)}°")
-with colB:
-    st.metric("Reference Sun Position", f"Azimuth: {meta.get('sun_az_b', 0)}°", f"Elevation: {meta.get('sun_el_b', 0)}°")
+st.write("")
 
-if st.button("Run Illumination Analysis", type="primary", use_container_width=True):
-    if sun_geometry:
-        with st.spinner("Analyzing illumination and shadows..."):
-            try:
-                img_a_gray = cv2.cvtColor(st.session_state.image_a, cv2.COLOR_BGR2GRAY)
-                img_b_gray = cv2.cvtColor(st.session_state.image_b, cv2.COLOR_BGR2GRAY)
-                
-                ill_map_a = sun_geometry.compute_illumination_map(img_a_gray, meta.get('sun_az_a', 0), meta.get('sun_el_a', 0))
-                ill_map_b = sun_geometry.compute_illumination_map(img_b_gray, meta.get('sun_az_b', 0), meta.get('sun_el_b', 0))
-                
-                shadow_a, dir_a = sun_geometry.compute_shadow_map(img_a_gray, meta.get('sun_az_a', 0), meta.get('sun_el_a', 0))
-                shadow_b, dir_b = sun_geometry.compute_shadow_map(img_b_gray, meta.get('sun_az_b', 0), meta.get('sun_el_b', 0))
-                
-                score = sun_geometry.illumination_consistency_score(
-                    st.session_state.image_a, st.session_state.image_b, 
-                    meta.get('sun_az_a', 0), meta.get('sun_el_a', 0), 
-                    meta.get('sun_az_b', 0), meta.get('sun_el_b', 0)
-                )
-                
-                st.session_state.sun_analysis = {
-                    "ill_map_a": ill_map_a, "ill_map_b": ill_map_b,
-                    "shadow_a": shadow_a, "shadow_b": shadow_b,
-                    "score": score
-                }
-                
-                st.success("✅ Illumination analysis completed!")
-            except Exception as e:
-                st.error(f"Error during analysis: {e}")
-    else:
-        st.error("Core module 'sun_geometry' not found.")
+# Inputs for Sun Geometry
+col_g1, col_g2 = st.columns(2)
 
-if "sun_analysis" in st.session_state:
-    st.markdown("### Illumination Analysis")
-    col1, col2 = st.columns(2)
-    with col1:
-        if sun_geometry:
-            vis_sun_a = sun_geometry.visualize_sun_direction(st.session_state.image_a, meta.get('sun_az_a', 0), meta.get('sun_el_a', 0))
-            st.image(cv2.cvtColor(vis_sun_a, cv2.COLOR_BGR2RGB), caption="Source Sun Direction", use_container_width=True)
-    with col2:
-        if sun_geometry:
-            vis_sun_b = sun_geometry.visualize_sun_direction(st.session_state.image_b, meta.get('sun_az_b', 0), meta.get('sun_el_b', 0))
-            st.image(cv2.cvtColor(vis_sun_b, cv2.COLOR_BGR2RGB), caption="Reference Sun Direction", use_container_width=True)
-            
-    st.markdown("### Shadow Analysis")
-    col3, col4 = st.columns(2)
-    shadow_a = st.session_state.sun_analysis.get("shadow_a")
-    shadow_b = st.session_state.sun_analysis.get("shadow_b")
+with col_g1:
+    st.subheader("Input Image Sun Position (Chandrayaan-2)")
+    sun_az_a = st.slider("Input Sun Azimuth (°):", 0.0, 360.0, 150.0, 5.0)
+    sun_el_a = st.slider("Input Sun Elevation (°):", 5.0, 85.0, 28.0, 1.0)
+
+with col_g2:
+    st.subheader("Reference Image Sun Position (LROC Catalog)")
+    sun_az_b = st.slider("Reference Sun Azimuth (°):", 0.0, 360.0, 135.0, 5.0)
+    sun_el_b = st.slider("Reference Sun Elevation (°):", 5.0, 85.0, 30.0, 1.0)
+
+st.write("---")
+
+# Compute illumination maps
+if 'new_image_bgr' in st.session_state:
+    img_a = st.session_state['new_image_bgr']
+    img_b = top_match['ref_image']
     
-    with col3:
-        if sun_geometry and shadow_a is not None:
-            vis_shad_a = sun_geometry.visualize_shadow_analysis(st.session_state.image_a, shadow_a, meta.get('sun_az_a', 0))
-            st.image(cv2.cvtColor(vis_shad_a, cv2.COLOR_BGR2RGB), caption="Source Shadow Analysis", use_container_width=True)
-    with col4:
-        if sun_geometry and shadow_b is not None:
-            vis_shad_b = sun_geometry.visualize_shadow_analysis(st.session_state.image_b, shadow_b, meta.get('sun_az_b', 0))
-            st.image(cv2.cvtColor(vis_shad_b, cv2.COLOR_BGR2RGB), caption="Reference Shadow Analysis", use_container_width=True)
-            
-    st.markdown("### Correspondence Confidence Breakdown")
-    score = st.session_state.sun_analysis.get("score", 0.0)
+    gray_a = cv2.cvtColor(img_a, cv2.COLOR_BGR2GRAY)
+    gray_b = cv2.cvtColor(img_b, cv2.COLOR_BGR2GRAY)
     
-    if sun_geometry:
-        try:
-            breakdown = sun_geometry.compute_confidence_breakdown(0.85, 0.90, score)
-        except Exception:
-            breakdown = {"structure": 0.85, "geometry": 0.90, "illumination": score, "combined": 0.88}
-    else:
-        breakdown = {"structure": 0.85, "geometry": 0.90, "illumination": score, "combined": 0.88}
+    illum_a = compute_illumination_map(gray_a, sun_az_a, sun_el_a)
+    illum_b = compute_illumination_map(gray_b, sun_az_b, sun_el_b)
+    
+    shad_a = compute_shadow_map(gray_a)
+    shad_b = compute_shadow_map(gray_b)
+    
+    sun_score = illumination_consistency_score(illum_a, illum_b, shad_a, shad_b)
+    
+    # Confidence breakdown
+    geom_score = min(1.0, top_match['inliers'] / 30.0)
+    struct_score = top_match['confidence'] / 100.0
+    
+    overall_conf, breakdown = compute_confidence_breakdown(struct_score, geom_score, sun_score)
+    
+    st.subheader("Illumination & Shadow Maps")
+    vis_col1, vis_col2 = st.columns(2)
+    
+    with vis_col1:
+        st.image(illum_a, caption="Input Illumination Shading Map", use_container_width=True)
+        st.image(shad_a, caption="Input Shadow Mask", use_container_width=True)
         
-    fig = go.Figure()
-    fig.add_trace(go.Bar(
-        y=['Structure Similarity', 'Geometry Consistency', 'Illumination Consistency', 'Combined Confidence'],
-        x=[breakdown.get('structure', 0), breakdown.get('geometry', 0), breakdown.get('illumination', 0), breakdown.get('combined', 0)],
-        orientation='h',
-        marker=dict(color=['#636EFA', '#EF553B', '#00CC96', '#AB63FA'])
-    ))
-    fig.update_layout(
-        template='plotly_dark',
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)',
-        xaxis_title="Confidence Score",
-        margin=dict(l=0, r=0, t=30, b=0)
-    )
-    st.plotly_chart(fig, use_container_width=True)
+    with vis_col2:
+        st.image(illum_b, caption="Reference Illumination Shading Map", use_container_width=True)
+        st.image(shad_b, caption="Reference Shadow Mask", use_container_width=True)
+        
+    st.write("---")
+    st.subheader("Combined Confidence Assessment")
     
-    st.metric("Illumination Consistency Score", f"{score:.2f}")
+    c_col1, c_col2, c_col3, c_col4 = st.columns(4)
+    with c_col1:
+        st.metric("Structure Score", f"{breakdown['structure_score'] * 100:.1f}%")
+    with c_col2:
+        st.metric("Geometry Score", f"{breakdown['geometry_score'] * 100:.1f}%")
+    with c_col3:
+        st.metric("Sun Illumination Score", f"{breakdown['sun_score'] * 100:.1f}%")
+    with c_col4:
+        st.metric("Overall Match Confidence", f"{overall_conf * 100:.1f}%", delta="HIGH CONFIDENCE" if overall_conf > 0.6 else "MEDIUM CONFIDENCE")
+        
+    st.info("👉 Ready to link this image to the catalog? Proceed to **Page 4 (Confirm & Update)**.")

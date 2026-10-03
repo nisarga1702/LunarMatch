@@ -9,6 +9,15 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
+# Initialize Crater Catalog on startup
+from core.catalog_builder import populate_default_catalog
+from core.crater_catalog import get_catalog_stats
+
+try:
+    populate_default_catalog()
+except Exception as e:
+    st.error(f"Catalog initialization error: {e}")
+
 # Load custom CSS
 css_path = os.path.join(os.path.dirname(__file__), "assets", "style.css")
 if os.path.exists(css_path):
@@ -20,9 +29,22 @@ else:
 # --- Sidebar ---
 with st.sidebar:
     st.markdown("<h2 class='gradient-text'>LunarMatch-TGS</h2>", unsafe_allow_html=True)
-    st.caption("Team Name | SIH 2026")
+    st.caption("Crater Catalog Matching System | SIH 2026")
     st.markdown("---")
-    st.markdown("👈 **Use the sidebar above to navigate through the pipeline stages.**")
+    
+    # Display Catalog Stats
+    try:
+        stats = get_catalog_stats()
+        st.markdown("### 🗃️ Crater Catalog Status")
+        st.metric("Total Catalog Craters", stats['total_craters'])
+        st.metric("Reference & Linked Images", stats['total_images'])
+        if stats['pending_images'] > 0:
+            st.warning(f"⚠️ {stats['pending_images']} match(es) pending confirmation!")
+    except Exception:
+        pass
+        
+    st.markdown("---")
+    st.markdown("👈 **Use the sidebar navigation to access catalog management, image matching, and verification.**")
 
 # --- Main Page ---
 # Hero Section
