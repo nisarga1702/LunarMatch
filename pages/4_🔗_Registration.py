@@ -85,37 +85,37 @@ if "pipeline_results" in st.session_state:
         colA, colB = st.columns(2)
         if feature_matcher and "kp_a_vis" in res and "kp_b_vis" in res:
             with colA:
-                st.image(cv2.cvtColor(res["kp_a_vis"], cv2.COLOR_BGR2RGB), caption="Source Features", use_column_width=True)
+                st.image(cv2.cvtColor(res["kp_a_vis"], cv2.COLOR_BGR2RGB), caption="Source Features", use_container_width=True)
             with colB:
-                st.image(cv2.cvtColor(res["kp_b_vis"], cv2.COLOR_BGR2RGB), caption="Reference Features", use_column_width=True)
+                st.image(cv2.cvtColor(res["kp_b_vis"], cv2.COLOR_BGR2RGB), caption="Reference Features", use_container_width=True)
         else:
             st.info("Feature visualization not available.")
             
     with tab2:
         st.markdown("### Feature Matches")
         if "matches_vis" in res:
-            st.image(cv2.cvtColor(res["matches_vis"], cv2.COLOR_BGR2RGB), use_column_width=True)
+            st.image(cv2.cvtColor(res["matches_vis"], cv2.COLOR_BGR2RGB), use_container_width=True)
             
     with tab3:
         st.markdown("### RANSAC Inliers vs Outliers")
         if "ransac_vis" in res:
-            st.image(cv2.cvtColor(res["ransac_vis"], cv2.COLOR_BGR2RGB), use_column_width=True)
+            st.image(cv2.cvtColor(res["ransac_vis"], cv2.COLOR_BGR2RGB), use_container_width=True)
             
     with tab4:
         st.markdown("### Spatial Coverage")
         if "coverage_vis" in res:
-            st.image(cv2.cvtColor(res["coverage_vis"], cv2.COLOR_BGR2RGB), use_column_width=True)
+            st.image(cv2.cvtColor(res["coverage_vis"], cv2.COLOR_BGR2RGB), use_container_width=True)
             st.metric("Spatial Coverage (%)", f"{metrics.get('coverage_pct', 0.0):.1f}%")
             
     with tab5:
         st.markdown("### Registration Result")
         if "warped_image" in res:
             warped = res["warped_image"]
-            st.image(cv2.cvtColor(warped, cv2.COLOR_BGR2RGB), caption="Warped Source Image", use_column_width=True)
+            st.image(cv2.cvtColor(warped, cv2.COLOR_BGR2RGB), caption="Warped Source Image", use_container_width=True)
             
             st.markdown("### Blend Overlay")
             blend_alpha = st.slider("Blend Ratio", 0.0, 1.0, 0.5)
             if "image_b" in st.session_state:
                 img_b_resized = cv2.resize(st.session_state.image_b, (warped.shape[1], warped.shape[0]))
                 blended = cv2.addWeighted(warped, blend_alpha, img_b_resized, 1 - blend_alpha, 0)
-                st.image(cv2.cvtColor(blended, cv2.COLOR_BGR2RGB), caption="Blended Result", use_column_width=True)
+                st.image(cv2.cvtColor(blended, cv2.COLOR_BGR2RGB), caption="Blended Result", use_container_width=True)

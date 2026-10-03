@@ -128,9 +128,9 @@ if "image_a" in st.session_state and "image_b" in st.session_state:
     col1, col2 = st.columns(2)
     with col1:
         st.markdown(f"### Source: {st.session_state.metadata.get('sensor', 'Source')}")
-        st.image(cv2.cvtColor(st.session_state.image_a, cv2.COLOR_BGR2RGB), use_column_width=True)
+        st.image(cv2.cvtColor(st.session_state.image_a, cv2.COLOR_BGR2RGB), use_container_width=True)
         st.caption(f"Sun Azimuth: {st.session_state.metadata.get('sun_az_a')}° | Elevation: {st.session_state.metadata.get('sun_el_a')}°")
     with col2:
         st.markdown(f"### Reference: {st.session_state.metadata.get('reference', 'Reference')}")
-        st.image(cv2.cvtColor(st.session_state.image_b, cv2.COLOR_BGR2RGB), use_column_width=True)
+        st.image(cv2.cvtColor(st.session_state.image_b, cv2.COLOR_BGR2RGB), use_container_width=True)
         st.caption(f"Sun Azimuth: {st.session_state.metadata.get('sun_az_b')}° | Elevation: {st.session_state.metadata.get('sun_el_b')}°")

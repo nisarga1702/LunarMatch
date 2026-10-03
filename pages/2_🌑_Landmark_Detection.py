@@ -79,20 +79,20 @@ if "landmarks_a" in st.session_state:
     with tab1:
         colA, colB = st.columns(2)
         with colA:
-            st.image(cv2.cvtColor(st.session_state.image_a, cv2.COLOR_BGR2RGB), caption="Original Source", use_column_width=True)
+            st.image(cv2.cvtColor(st.session_state.image_a, cv2.COLOR_BGR2RGB), caption="Original Source", use_container_width=True)
         with colB:
             if landmark_detector:
                 vis_a = landmark_detector.visualize_landmarks(st.session_state.image_a, lm_a)
-                st.image(cv2.cvtColor(vis_a, cv2.COLOR_BGR2RGB), caption="Annotated Source", use_column_width=True)
+                st.image(cv2.cvtColor(vis_a, cv2.COLOR_BGR2RGB), caption="Annotated Source", use_container_width=True)
                 
     with tab2:
         colA, colB = st.columns(2)
         with colA:
-            st.image(cv2.cvtColor(st.session_state.image_b, cv2.COLOR_BGR2RGB), caption="Original Reference", use_column_width=True)
+            st.image(cv2.cvtColor(st.session_state.image_b, cv2.COLOR_BGR2RGB), caption="Original Reference", use_container_width=True)
         with colB:
             if landmark_detector:
                 vis_b = landmark_detector.visualize_landmarks(st.session_state.image_b, lm_b)
-                st.image(cv2.cvtColor(vis_b, cv2.COLOR_BGR2RGB), caption="Annotated Reference", use_column_width=True)
+                st.image(cv2.cvtColor(vis_b, cv2.COLOR_BGR2RGB), caption="Annotated Reference", use_container_width=True)
                 
     with tab3:
         st.markdown("### Spatial Relationship Graphs")
@@ -101,10 +101,10 @@ if "landmarks_a" in st.session_state:
             graph_a, graph_b = st.session_state.landmark_graphs
             with colA:
                 gvis_a = landmark_detector.visualize_landmark_graph(st.session_state.image_a, lm_a)
-                st.image(cv2.cvtColor(gvis_a, cv2.COLOR_BGR2RGB), caption="Source Graph", use_column_width=True)
+                st.image(cv2.cvtColor(gvis_a, cv2.COLOR_BGR2RGB), caption="Source Graph", use_container_width=True)
             with colB:
                 gvis_b = landmark_detector.visualize_landmark_graph(st.session_state.image_b, lm_b)
-                st.image(cv2.cvtColor(gvis_b, cv2.COLOR_BGR2RGB), caption="Reference Graph", use_column_width=True)
+                st.image(cv2.cvtColor(gvis_b, cv2.COLOR_BGR2RGB), caption="Reference Graph", use_container_width=True)
                 
         st.markdown("### Distance Matrix Heatmap")
         z = np.random.rand(10, 10)

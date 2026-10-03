@@ -77,11 +77,11 @@ if "sun_analysis" in st.session_state:
     with col1:
         if sun_geometry:
             vis_sun_a = sun_geometry.visualize_sun_direction(st.session_state.image_a, meta.get('sun_az_a', 0), meta.get('sun_el_a', 0))
-            st.image(cv2.cvtColor(vis_sun_a, cv2.COLOR_BGR2RGB), caption="Source Sun Direction", use_column_width=True)
+            st.image(cv2.cvtColor(vis_sun_a, cv2.COLOR_BGR2RGB), caption="Source Sun Direction", use_container_width=True)
     with col2:
         if sun_geometry:
             vis_sun_b = sun_geometry.visualize_sun_direction(st.session_state.image_b, meta.get('sun_az_b', 0), meta.get('sun_el_b', 0))
-            st.image(cv2.cvtColor(vis_sun_b, cv2.COLOR_BGR2RGB), caption="Reference Sun Direction", use_column_width=True)
+            st.image(cv2.cvtColor(vis_sun_b, cv2.COLOR_BGR2RGB), caption="Reference Sun Direction", use_container_width=True)
             
     st.markdown("### Shadow Analysis")
     col3, col4 = st.columns(2)
@@ -91,11 +91,11 @@ if "sun_analysis" in st.session_state:
     with col3:
         if sun_geometry and shadow_a is not None:
             vis_shad_a = sun_geometry.visualize_shadow_analysis(st.session_state.image_a, shadow_a, meta.get('sun_az_a', 0))
-            st.image(cv2.cvtColor(vis_shad_a, cv2.COLOR_BGR2RGB), caption="Source Shadow Analysis", use_column_width=True)
+            st.image(cv2.cvtColor(vis_shad_a, cv2.COLOR_BGR2RGB), caption="Source Shadow Analysis", use_container_width=True)
     with col4:
         if sun_geometry and shadow_b is not None:
             vis_shad_b = sun_geometry.visualize_shadow_analysis(st.session_state.image_b, shadow_b, meta.get('sun_az_b', 0))
-            st.image(cv2.cvtColor(vis_shad_b, cv2.COLOR_BGR2RGB), caption="Reference Shadow Analysis", use_column_width=True)
+            st.image(cv2.cvtColor(vis_shad_b, cv2.COLOR_BGR2RGB), caption="Reference Shadow Analysis", use_container_width=True)
             
     st.markdown("### Correspondence Confidence Breakdown")
     score = st.session_state.sun_analysis.get("score", 0.0)

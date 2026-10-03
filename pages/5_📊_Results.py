@@ -80,15 +80,15 @@ vc1, vc2, vc3 = st.columns(3)
 with vc1:
     st.markdown("**Source Image**")
     if "image_a" in st.session_state:
-        st.image(cv2.cvtColor(st.session_state.image_a, cv2.COLOR_BGR2RGB), use_column_width=True)
+        st.image(cv2.cvtColor(st.session_state.image_a, cv2.COLOR_BGR2RGB), use_container_width=True)
 with vc2:
     st.markdown("**Correspondences**")
     if "ransac_vis" in res:
-        st.image(cv2.cvtColor(res["ransac_vis"], cv2.COLOR_BGR2RGB), use_column_width=True)
+        st.image(cv2.cvtColor(res["ransac_vis"], cv2.COLOR_BGR2RGB), use_container_width=True)
 with vc3:
     st.markdown("**Registered Image**")
     if "warped_image" in res:
-        st.image(cv2.cvtColor(res["warped_image"], cv2.COLOR_BGR2RGB), use_column_width=True)
+        st.image(cv2.cvtColor(res["warped_image"], cv2.COLOR_BGR2RGB), use_container_width=True)
 
 st.markdown("---")
 st.markdown("### Pipeline Architecture")
