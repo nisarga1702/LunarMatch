@@ -1,8 +1,21 @@
 import streamlit as st
 import os
 import cv2
+import numpy as np
 import pandas as pd
 import json
+
+class NumpyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        if isinstance(obj, (np.integer,)):
+            return int(obj)
+        if isinstance(obj, (np.floating,)):
+            return float(obj)
+        if isinstance(obj, (np.bool_,)):
+            return bool(obj)
+        return super().default(obj)
 
 st.set_page_config(page_title="Results | LunarMatch", page_icon="📊", layout="wide")
 
@@ -47,7 +60,7 @@ with col1:
     st.dataframe(df_metrics, hide_index=True, use_container_width=True)
     
     st.markdown("### Export")
-    metrics_json = json.dumps(metrics, indent=4)
+    metrics_json = json.dumps(metrics, indent=4, cls=NumpyEncoder)
     st.download_button(
         label="Download Metrics (JSON)",
         data=metrics_json,
