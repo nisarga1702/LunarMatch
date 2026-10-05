@@ -1,0 +1,26 @@
+name: Render Backend Keep-Alive
+
+on:
+  schedule:
+    # Run every 10 minutes 24/7
+    - cron: '*/10 * * * *'
+  workflow_dispatch: # Allow manual trigger from GitHub UI
+
+jobs:
+  ping-render-server:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Render Backend App
+        run: |
+          URL="${{ secrets.RENDER_APP_URL }}"
+          if [ -z "$URL" ]; then
+            URL="https://lunarmatch-tgs.onrender.com"
+          fi
+          echo "Pinging backend server at $URL..."
+          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$URL")
+          echo "HTTP Status Code: $HTTP_STATUS"
+          if [ "$HTTP_STATUS" -eq 200 ] || [ "$HTTP_STATUS" -eq 302 ] || [ "$HTTP_STATUS" -eq 301 ]; then
+            echo "Server is ACTIVE and responsive!"
+          else
+            echo "Warning: Received unexpected status code $HTTP_STATUS"
+          fi

@@ -18,6 +18,27 @@ try:
 except Exception as e:
     st.error(f"Catalog initialization error: {e}")
 
+# Self-ping background thread to maintain Render server active state
+import threading
+import time
+import urllib.request
+
+def _start_self_ping():
+    render_url = os.getenv("RENDER_URL", "https://lunarmatch-tgs.onrender.com")
+    def ping_loop():
+        while True:
+            time.sleep(600) # Ping every 10 mins
+            try:
+                urllib.request.urlopen(render_url, timeout=10)
+            except Exception:
+                pass
+    t = threading.Thread(target=ping_loop, daemon=True)
+    t.start()
+
+if 'ping_thread_started' not in st.session_state:
+    st.session_state['ping_thread_started'] = True
+    _start_self_ping()
+
 # Load custom CSS
 css_path = os.path.join(os.path.dirname(__file__), "assets", "style.css")
 if os.path.exists(css_path):
