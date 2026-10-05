@@ -187,18 +187,69 @@ def catalog_is_empty():
     return count == 0
 
 
+def get_all_albums():
+    """Return list of all crater albums with image counts and cover thumbnail."""
+    conn = _ensure_db()
+    conn.row_factory = sqlite3.Row
+    craters = conn.execute("SELECT * FROM craters ORDER BY id").fetchall()
+    albums = []
+    for c in craters:
+        d = dict(c)
+        # Count images in this album
+        img_count = conn.execute(
+            "SELECT COUNT(*) FROM crater_images WHERE crater_id = ?", (d['id'],)
+        ).fetchone()[0]
+        # Get cover image
+        cover_row = conn.execute(
+            "SELECT image_blob FROM crater_images WHERE crater_id = ? ORDER BY id LIMIT 1",
+            (d['id'],)
+        ).fetchone()
+        d['image_count'] = img_count
+        d['cover_image'] = _blob_to_img(cover_row[0]) if cover_row else None
+        albums.append(d)
+    conn.close()
+    return albums
+
+
+def train_and_add_to_album(crater_id, image, image_type='trained_reference',
+                           sun_az=0.0, sun_el=0.0, sensor='Chandrayaan-2 OHRC', confirmed=True):
+    """Add a new image to the crater album and retrain/update feature descriptor index."""
+    conn = _ensure_db()
+    
+    # Encode and insert image
+    conn.execute("""
+        INSERT INTO crater_images (crater_id, image_blob, image_type,
+                                   sun_azimuth, sun_elevation, sensor, confirmed, added_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    """, (crater_id, _img_to_blob(image), image_type,
+          sun_az, sun_el, sensor, 1 if confirmed else 0,
+          datetime.utcnow().isoformat()))
+    
+    # Update crater metadata with training log
+    crater = get_crater(crater_id)
+    if crater:
+        meta = json.loads(crater.get('metadata') or '{}')
+        meta['last_trained'] = datetime.utcnow().isoformat()
+        meta['trained_samples'] = meta.get('trained_samples', 1) + 1
+        conn.execute("UPDATE craters SET metadata = ? WHERE id = ?", (json.dumps(meta), crater_id))
+        
+    conn.commit()
+    conn.close()
+    return True
+
+
 def get_reference_patches():
-    """Return list of (crater_id, crater_name, label, image) for all reference images.
-    Used by the matching pipeline to compare against."""
+    """Return list of (crater_id, crater_name, label, image) for all reference & trained images.
+    Used by the matching pipeline to compare against trained database."""
     conn = _ensure_db()
     conn.row_factory = sqlite3.Row
     rows = conn.execute("""
         SELECT c.id as crater_id, c.name, c.label, ci.image_blob,
-               ci.sun_azimuth, ci.sun_elevation
+               ci.sun_azimuth, ci.sun_elevation, ci.image_type
         FROM craters c
         JOIN crater_images ci ON c.id = ci.crater_id
-        WHERE ci.image_type = 'reference' AND ci.confirmed = 1
-        ORDER BY c.id
+        WHERE ci.confirmed = 1
+        ORDER BY c.id, ci.id DESC
     """).fetchall()
     conn.close()
     results = []
@@ -207,3 +258,4 @@ def get_reference_patches():
         d['image'] = _blob_to_img(d.pop('image_blob'))
         results.append(d)
     return results
+

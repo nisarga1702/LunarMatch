@@ -8,6 +8,6 @@ from .feature_matcher import extract_features, match_features_bruteforce, landma
 from .registration import full_pipeline, ransac_filter, apply_registration, compute_registration_metrics
 from .crater_catalog import (add_crater, add_crater_image, get_all_craters, get_crater,
                               get_crater_images, get_catalog_stats, confirm_image, reject_image,
-                              get_reference_patches, catalog_is_empty)
+                              get_reference_patches, catalog_is_empty, get_all_albums, train_and_add_to_album)
 from .catalog_builder import (populate_default_catalog, detect_and_number_craters,
                                extract_crater_patch, FAMOUS_CRATERS)
